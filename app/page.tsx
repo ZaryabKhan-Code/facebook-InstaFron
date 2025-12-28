@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import { Card, Input, Button } from '@/components'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+const API_URL = 'https://rnd-48f97bdd68a0.herokuapp.com/api'
 
 export default function Home() {
   const [username, setUsername] = useState('')

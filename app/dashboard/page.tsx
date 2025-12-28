@@ -145,7 +145,7 @@ function DashboardContent() {
           </div>
 
           {accounts.length > 0 && (
-            <div className="mt-8">
+            <div className="mt-8 space-y-3">
               <Button
                 variant="success"
                 size="large"
@@ -153,6 +153,16 @@ function DashboardContent() {
                 onClick={handleGoToMessages}
               >
                 Go to Messages
+              </Button>
+              <Button
+                variant="secondary"
+                size="large"
+                fullWidth
+                onClick={() => router.push('/ai-settings')}
+                className="flex items-center justify-center gap-2"
+              >
+                <span>🤖</span>
+                AI Settings
               </Button>
             </div>
           )}

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://rnd-48f97bdd68a0.herokuapp.com/api'
+const API_URL = 'https://rnd-48f97bdd68a0.herokuapp.com/api'
 
 export interface User {
   id: number
@@ -30,7 +30,12 @@ export interface Message {
   sender_id: string
   recipient_id: string
   direction: 'incoming' | 'outgoing'
-  content: string
+  message_type: 'text' | 'image' | 'video' | 'audio' | 'file' | 'sticker' | 'location'
+  content: string | null
+  attachment_url: string | null
+  attachment_type: string | null
+  attachment_filename: string | null
+  thumbnail_url: string | null
   status: 'sent' | 'delivered' | 'read' | 'failed'
   created_at: string
   updated_at: string
@@ -41,8 +46,26 @@ export interface Conversation {
   platform: string
   participant_id: string
   participant_name: string | null
+  participant_username: string | null
+  participant_profile_pic: string | null
   last_message: Message | null
   unread_count: number
+  ai_enabled: boolean
+}
+
+export interface AISettings {
+  id?: number
+  user_id: number
+  ai_provider: 'openai' | 'anthropic'
+  api_key: string | null
+  model_name: string
+  system_prompt: string | null
+  response_tone: string
+  max_tokens: number
+  temperature: number
+  context_messages_count: number
+  created_at?: string
+  updated_at?: string
 }
 
 // User APIs
@@ -133,6 +156,56 @@ export const sendMessage = async (
 export const syncMessages = async (userId: number, accountId: number) => {
   const response = await axios.get(
     `${API_URL}/messages/sync?user_id=${userId}&account_id=${accountId}`
+  )
+  return response.data
+}
+
+// AI APIs
+export const toggleAI = async (
+  conversationId: string,
+  userId: number,
+  aiEnabled: boolean
+) => {
+  const response = await axios.post(
+    `${API_URL}/ai/conversations/${conversationId}/toggle?user_id=${userId}`,
+    { ai_enabled: aiEnabled }
+  )
+  return response.data
+}
+
+export const getAIStatus = async (conversationId: string, userId: number) => {
+  const response = await axios.get(
+    `${API_URL}/ai/conversations/${conversationId}/status?user_id=${userId}`
+  )
+  return response.data
+}
+
+export const getAISettings = async (userId: number) => {
+  const response = await axios.get<AISettings>(
+    `${API_URL}/ai/settings?user_id=${userId}`
+  )
+  return response.data
+}
+
+export const updateAISettings = async (userId: number, settings: Partial<AISettings>) => {
+  const response = await axios.post<AISettings>(
+    `${API_URL}/ai/settings?user_id=${userId}`,
+    settings
+  )
+  return response.data
+}
+
+export const testAIResponse = async (
+  userId: number,
+  conversationId: string,
+  testMessage: string
+) => {
+  const response = await axios.post<{ response: string }>(
+    `${API_URL}/ai/test?user_id=${userId}`,
+    {
+      conversation_id: conversationId,
+      message: testMessage,
+    }
   )
   return response.data
 }
